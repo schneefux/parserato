@@ -1,6 +1,8 @@
 Parserato
 ===
 
+[![Build Status](https://travis-ci.com/schneefux/parserato.svg?token=7Xr5KgmaaKq86Bsihnpx&branch=master)](https://travis-ci.com/schneefux/parserato)
+
 Serato data interface for NodeJS.
 
 Find and read Serato crates, read and write cues Serato GEOB frames.
