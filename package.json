@@ -4,15 +4,12 @@
   "description": "",
   "private": true,
   "main": "dist/index.js",
-  "directories": {
-    "lib": "lib"
-  },
   "scripts": {
     "test": "jest",
     "build": "tsc"
   },
   "bin": {
-    "parserato": "./dist/index.js"
+    "parserato": "./dist/cli.js"
   },
   "author": "schneefux",
   "license": "UNLICENSED",
