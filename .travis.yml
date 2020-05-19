@@ -1,0 +1,17 @@
+language: node_js
+dist: bionic
+os:
+  - linux
+  - osx
+node_js:
+  - "10"
+  - "11"
+  - "12"
+  - "13"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - cmake
+      - cmake-data
