@@ -7,7 +7,7 @@ import { decode, encode } from "./serato/index"
 import TaglibAudioProperties from "./TaglibAudioProperties"
 import { deserialize, serialize } from "./taglib/index"
 import TaglibId3Map from "./TaglibId3Map"
-import TrackInfo from "./TrackInformation"
+import TrackInfo from "./TrackInfo"
 import SeratoTrackInfo from "./serato/SeratoTrackInfo"
 
 const readId3Tags = promisify(taglib.readId3Tags)

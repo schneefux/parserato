@@ -3,8 +3,8 @@ import SeratoMarker from "./marker/SeratoMarker"
 import { decode as decodeMarker } from "./marker"
 
 /**
- * Implements a 'Serato Markers2' tag,
- * which contains information about BPM lock,
+ * Implements a 'Serato Markers2' frame,
+ * which contains markers with information about BPM lock,
  * track color, cues, loops and flips.
  *
  * @see https://github.com/Holzhaus/serato-tags/blob/master/docs/serato_markers2.md
