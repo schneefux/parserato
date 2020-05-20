@@ -12,7 +12,7 @@ deploy:
   provider: npm
   edge: true
   on:
-    branch: master
+    tags: true
   email: schneefux+npm@schneefux.xyz
   access: private
   registry: https://npm.pkg.github.com/schneefux
