@@ -1,8 +1,8 @@
 {
-  "name": "parserato",
+  "name": "@schneefux/parserato",
+  "repository": "git://github.com/schneefux/parserato.git",
   "version": "1.0.0",
   "description": "",
-  "private": true,
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
