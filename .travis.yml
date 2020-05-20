@@ -3,18 +3,11 @@ dist: bionic
 os:
   - linux
   - osx
+  - windows
 node_js:
   - "10"
-  - "11"
   - "12"
-  - "13"
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - cmake
-      - cmake-data
+  - "14"
 deploy:
   provider: npm
   edge: true

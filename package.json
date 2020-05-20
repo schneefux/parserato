@@ -16,7 +16,7 @@
   "dependencies": {
     "drivelist": "^8.0.10",
     "glob": "^7.1.6",
-    "taglib3": "^3.0.10"
+    "taglib3": "^3.0.11"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
