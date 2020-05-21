@@ -8,11 +8,25 @@ node_js:
   - "10"
   - "12"
   - "14"
-deploy:
-  provider: npm
-  edge: true
-  on:
-    tags: true
-  email: schneefux+npm@schneefux.xyz
-  access: private
-  registry: https://npm.pkg.github.com/schneefux
+jobs:
+  include:
+    - stage: npm
+      node_js: "12"
+      script: yarn build
+      deploy:
+        provider: npm
+        edge: true
+        on:
+          tags: true
+        email: schneefux+npm@schneefux.xyz
+        access: private
+        registry: https://npm.pkg.github.com/schneefux
+    - stage: cli
+      node_js: "12"
+      script: yarn package
+      deploy:
+        provider: releases
+        file: parserato-*.zip
+        overwrite: true
+        #on:
+        #  tags: true
