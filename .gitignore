@@ -1,3 +1,5 @@
+parserato-cli
+*.zip
 .vscode
 build/*
 !build/icons
