@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as fs from 'fs'
+import yargs = require('yargs')
 import { listRoots, listCrates, listSongs } from './crate'
 import { read } from './track'
 
@@ -7,29 +7,48 @@ function log(data: any) {
   console.log(JSON.stringify(data, null, 2))
 }
 
-async function main() {
-  const args = process.argv.slice(2)
-  if (args.length == 0) {
-    // list roots
-    log(await listRoots())
-    return
-  }
-
-  const givenPath = args[0]
-  const stat = await fs.promises.lstat(givenPath)
-  if (stat.isDirectory()) {
-    // list crates
-    log(await listCrates(givenPath))
-    return
-  }
-
-  if (givenPath.endsWith('.crate')) {
-    // list songs
-    log(await listSongs(givenPath))
-    return
-  }
-
-  log(await read(givenPath))
-}
-
-main().catch(console.error)
+yargs
+  .scriptName('parserato')
+  .command('drives',
+    'list mountpoints',
+    () => {},
+    async () => log(await listRoots())
+  )
+  .command('crates <mountpoint>',
+    'list crates on drive',
+    (yargs) => {
+      yargs.positional('path', {
+        describe: 'drive mountpoint to search',
+        type: 'string',
+      })
+    },
+    async (argv) => {
+      log(await listCrates(argv.mountpoint as string))
+    }
+  )
+  .command('songs <crate>',
+    'list songs in crate',
+    (yargs) => {
+      yargs.positional('path', {
+        describe: 'crate to read',
+        type: 'string',
+      })
+    },
+    async (argv) => {
+      log(await listSongs(argv.crate as string))
+    }
+  )
+  .command('tags <song>',
+    'list tags for song',
+    (yargs) => {
+      yargs.positional('path', {
+        describe: 'song to read',
+        type: 'string',
+      })
+    },
+    async (argv) => {
+      log(await read(argv.song as string))
+    }
+  )
+  .demandCommand()
+  .argv

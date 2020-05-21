@@ -17,10 +17,10 @@ Command Line Interface
 
 For debugging and non NodeJS applications, a CLI application can be used which prints JSON data to the console.
 
-  * `parserato`: List mountpoints
-  * `parserato /m`: List crates in mountpoint
-  * `parserato /m/_Serato_/Subcrates/test1.crate`: List songs in crate
-  * `parserato /m/music/retro_funky.flac`: Read track information
+  * `parserato drives`: list mountpoints
+  * `parserato crates /m`: list crates in mountpoint
+  * `parserato songs /m/_Serato_/Subcrates/test1.crate`: list songs in crate
+  * `parserato tags /m/music/retro_funky.flac`: list tags for song
 
 Crates
 ---
