@@ -1,13 +1,13 @@
 {
   "name": "@schneefux/parserato",
   "repository": "git://github.com/schneefux/parserato.git",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "package": "yarn build && node ./dist/package.js"
+    "package": "node ./dist/package.js"
   },
   "bin": {
     "parserato": "./dist/cli.js"
