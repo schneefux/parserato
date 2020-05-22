@@ -1,10 +1,13 @@
 import SeratoMarkers2Frame from "./frame/SeratoMarkers2Frame"
-import SeratoCueMarker from "./frame/marker/SeratoCueMarker"
-import SeratoBpmLockMarker from "./frame/marker/SeratoBpmLockMarker"
-import SeratoColorMarker from "./frame/marker/SeratoColorMarker"
+import SeratoCueMarker from "./frame/marker2/SeratoCueMarker"
+import SeratoBpmLockMarker from "./frame/marker2/SeratoBpmLockMarker"
+import SeratoColorMarker from "./frame/marker2/SeratoColorMarker"
 import { decode as decodeFrame, encode as encodeFrame } from "./frame/index"
 import FrameMap from "./FrameMap"
 import SeratoTrackInfo from "./SeratoTrackInfo"
+import SeratoBeatGridFrame from "./frame/SeratoBeatGridFrame"
+import SeratoNonTerminalBeatGridMarker from "./frame/beatgrid/SeratoNonTerminalBeatGridMarker"
+import SeratoTerminalBeatGridMarker from "./frame/beatgrid/SeratoTerminalBeatGridMarker"
 
 /**
  * Read track information from GEOB Frame buffers.
@@ -20,7 +23,7 @@ export function decode(tags: FrameMap) {
     .filter(frame => frame !== null)
 
   const markers2 = frames
-    .filter(f => f instanceof SeratoMarkers2Frame)[0]
+    .filter(f => f instanceof SeratoMarkers2Frame)[0] as SeratoMarkers2Frame|null
 
   if (markers2) {
     trackInfo.cues = markers2.data
@@ -44,6 +47,23 @@ export function decode(tags: FrameMap) {
     if (color) {
       trackInfo.color = color.color
     }
+  }
+
+  const beatgrid = frames
+    .filter(f => f instanceof SeratoBeatGridFrame)[0] as SeratoBeatGridFrame|null
+
+  if (beatgrid) {
+    trackInfo.beatgridMarkers = []
+    for (let n = 0; n < beatgrid.data.length - 1; n++) {
+      const nonTerminal = beatgrid.data[n] as SeratoNonTerminalBeatGridMarker
+      const next = beatgrid.data[n+1]
+      const bpm = nonTerminal.beatsTillNext / ((next.position - nonTerminal.position) / 60)
+      trackInfo.beatgridMarkers.push({
+        position: nonTerminal.position,
+        bpm,
+      })
+    }
+    trackInfo.beatgridMarkers.push(beatgrid.data[beatgrid.data.length - 1] as SeratoTerminalBeatGridMarker)
   }
 
   return trackInfo
@@ -85,7 +105,26 @@ export function encode(trackInfo: SeratoTrackInfo) {
     markers2.data.push(bpmLockMarker)
   }
 
+  const beatgrid = new SeratoBeatGridFrame()
+  if (trackInfo.beatgridMarkers !== undefined) {
+    for (let n = 0; n < trackInfo.beatgridMarkers.length - 1; n++) {
+      const marker = new SeratoNonTerminalBeatGridMarker()
+      const thisMarker = trackInfo.beatgridMarkers[n]
+      const nextMarker = trackInfo.beatgridMarkers[n + 1]
+      marker.beatsTillNext = Math.floor(thisMarker.bpm * (nextMarker.position - thisMarker.position) / 60)
+      marker.position = thisMarker.position
+      beatgrid.data.push(marker)
+    }
+
+    const marker = new SeratoTerminalBeatGridMarker()
+    const thisMarker = trackInfo.beatgridMarkers[trackInfo.beatgridMarkers.length - 1]
+    marker.position = thisMarker.position
+    marker.bpm = thisMarker.bpm
+    beatgrid.data.push(marker)
+  }
+
   return {
     [markers2.id]: encodeFrame(markers2),
+    [beatgrid.id]: encodeFrame(beatgrid),
   } as FrameMap
 }

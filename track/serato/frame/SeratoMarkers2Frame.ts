@@ -1,6 +1,6 @@
 import Frame from "./Frame"
-import SeratoMarker from "./marker/SeratoMarker"
-import { decode as decodeMarker } from "./marker"
+import SeratoMarker from "./marker2/SeratoMarker2"
+import { decode as decodeMarker } from "./marker2"
 
 /**
  * Implements a 'Serato Markers2' frame,
@@ -14,7 +14,7 @@ export default class SeratoMarkers2Frame implements Frame<SeratoMarker[]> {
   mimetype = 'application/octet-stream'
   filename = ''
   id = 'Serato Markers2'
-  size = 512
+  size = 512 - 41 // 41 for GEOB header
   versionMajor: number = 1
   versionMinor: number = 1
   data: SeratoMarker[] = []
