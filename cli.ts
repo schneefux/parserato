@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import yargs = require('yargs')
 import { listRoots, listCrates, listSongs } from './crate'
-import { read } from './track'
+import { read, readSeratoData } from './track'
+import * as taglib from 'taglib3'
 
 function log(data: any) {
   console.log(JSON.stringify(data, null, 2))
@@ -17,7 +18,7 @@ yargs
   .command('crates <mountpoint>',
     'list crates on drive',
     (yargs) => {
-      yargs.positional('path', {
+      yargs.positional('mountpoint', {
         describe: 'drive mountpoint to search',
         type: 'string',
       })
@@ -29,7 +30,7 @@ yargs
   .command('songs <crate>',
     'list songs in crate',
     (yargs) => {
-      yargs.positional('path', {
+      yargs.positional('crate', {
         describe: 'crate to read',
         type: 'string',
       })
@@ -41,13 +42,28 @@ yargs
   .command('tags <song>',
     'list tags for song',
     (yargs) => {
-      yargs.positional('path', {
+      yargs.positional('song', {
         describe: 'song to read',
         type: 'string',
       })
+      yargs.option('raw', {
+        alias: 'r',
+        type: 'boolean',
+        default: false,
+        description: 'Output tags unparsed',
+      })
     },
     async (argv) => {
-      log(await read(argv.song as string))
+      const song = argv.song as string
+      if (argv.raw) {
+        let tags = taglib.readTagsSync(song)
+        if (song.endsWith('.mp3')) {
+          tags = { ...tags, ...taglib.readId3TagsSync(song) }
+        }
+        log(tags)
+      } else {
+        log(await read(song))
+      }
     }
   )
   .demandCommand()
