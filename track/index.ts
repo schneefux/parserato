@@ -9,6 +9,7 @@ import { deserialize, serialize } from "./taglib/index"
 import TaglibId3Map from "./TaglibId3Map"
 import TrackInfo from "./TrackInfo"
 import SeratoTrackInfo from "./serato/SeratoTrackInfo"
+import TaglibMap from "./taglib/TaglibMap"
 
 const readId3Tags = promisify(taglib.readId3Tags)
 const readTaglibTags = promisify(taglib.readTags)
@@ -89,12 +90,15 @@ export async function writeSeratoData(trackPath: string, trackInfo: SeratoTrackI
   const tags = encode(trackInfo)
 
   if (trackPath.endsWith('.mp3')) {
-    const taglibTags = {
-      'Serato Markers2': tags['Serato Markers2'].toString('base64'),
+    const taglibTags = {} as TaglibId3Map
+
+    if ('Serato Markers2' in tags) {
+      taglibTags['Serato Markers2'] = tags['Serato Markers2'].toString('base64')
       // 'Serato Markers_' duplicates first 5 cues
       // and gets precedence over Serato Markers2 -> delete it
-      'Serato Markers_': '',
-    } as TaglibId3Map
+      taglibTags['Serato Markers_'] = ''
+    }
+
     if ('Serato BeatGrid' in tags) {
       taglibTags['Serato BeatGrid'] = tags['Serato BeatGrid'].toString('base64')
     }
@@ -102,9 +106,11 @@ export async function writeSeratoData(trackPath: string, trackInfo: SeratoTrackI
     await writeId3Tags(trackPath, taglibTags)
   } else {
     // VORBIS COMMENT has newlines every 72 characters
-    const taglibTags = {
-      SERATO_MARKERS_V2: [tags['Serato Markers2']
-        .toString('base64').replace(/(.{72})/g, '$1\n')],
+    const taglibTags = {} as TaglibMap
+
+    if ('Serato Markers2' in tags) {
+      taglibTags['SERATO_MARKERS_V2'] = [tags['Serato Markers2']
+        .toString('base64').replace(/(.{72})/g, '$1\n')]
     }
 
     if ('Serato BeatGrid' in tags) {

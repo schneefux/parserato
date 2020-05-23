@@ -72,42 +72,51 @@ export function decode(tags: FrameMap) {
 /**
  * Encode track information to GEOB Frame buffers.
  *
+ * Return 'Serato Marker2' if any of color,
+ *   cues or bpmLock are given.
+ *   Defaults will be used for those that are not.
+ * Return 'Serato BeatGrid' if beatgridMarkers are given.
+ *
  * @param trackInfo data
  * @returns GEOB Frames
  */
 export function encode(trackInfo: SeratoTrackInfo) {
   const frameMap = {} as FrameMap
 
-  const markers2 = new SeratoMarkers2Frame()
+  if (trackInfo.color !== undefined
+   || trackInfo.cues !== undefined
+   || trackInfo.bpmLock !== undefined) {
+    const markers2 = new SeratoMarkers2Frame()
 
-  if (trackInfo.color !== undefined) {
-    const colorMarker = Object.assign(new SeratoColorMarker(), {
-      color: trackInfo.color,
+    if (trackInfo.color !== undefined) {
+      const colorMarker = Object.assign(new SeratoColorMarker(), {
+        color: trackInfo.color || '#ffffff',
+      })
+
+      markers2.data.push(colorMarker)
+    }
+
+    trackInfo.cues?.forEach((cue, index) => {
+      const cueMarker = Object.assign(new SeratoCueMarker(), {
+        index: cue.index || index,
+        milliseconds: cue.milliseconds || 0,
+        color: cue.color || '#ff0000',
+        name: cue.name || '',
+      })
+
+      markers2.data.push(cueMarker)
     })
 
-    markers2.data.push(colorMarker)
+    if (trackInfo.bpmLock !== undefined) {
+      const bpmLockMarker = Object.assign(new SeratoBpmLockMarker(), {
+        isActive: trackInfo.bpmLock || false,
+      })
+
+      markers2.data.push(bpmLockMarker)
+    }
+
+    frameMap[markers2.id] = encodeFrame(markers2)
   }
-
-  trackInfo.cues?.forEach((cue, index) => {
-    const cueMarker = Object.assign(new SeratoCueMarker(), {
-      index: cue.index || index,
-      milliseconds: cue.milliseconds,
-      color: cue.color || '#ff0000',
-      name: cue.name || '',
-    })
-
-    markers2.data.push(cueMarker)
-  })
-
-  if (trackInfo.bpmLock !== undefined) {
-    const bpmLockMarker = Object.assign(new SeratoBpmLockMarker(), {
-      isActive: trackInfo.bpmLock,
-    })
-
-    markers2.data.push(bpmLockMarker)
-  }
-
-  frameMap[markers2.id] = encodeFrame(markers2)
 
   if (trackInfo.beatgridMarkers !== undefined) {
     const beatgrid = new SeratoBeatGridFrame()
@@ -127,8 +136,6 @@ export function encode(trackInfo: SeratoTrackInfo) {
     marker.bpm = thisMarker.bpm
     beatgrid.data.push(marker)
 
-    // only write beatgrid information when beatgrid markers defined
-    // => do not overwrite
     frameMap[beatgrid.id] = encodeFrame(beatgrid)
   }
 
