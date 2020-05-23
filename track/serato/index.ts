@@ -76,6 +76,8 @@ export function decode(tags: FrameMap) {
  * @returns GEOB Frames
  */
 export function encode(trackInfo: SeratoTrackInfo) {
+  const frameMap = {} as FrameMap
+
   const markers2 = new SeratoMarkers2Frame()
 
   if (trackInfo.color !== undefined) {
@@ -105,8 +107,11 @@ export function encode(trackInfo: SeratoTrackInfo) {
     markers2.data.push(bpmLockMarker)
   }
 
-  const beatgrid = new SeratoBeatGridFrame()
+  frameMap[markers2.id] = encodeFrame(markers2)
+
   if (trackInfo.beatgridMarkers !== undefined) {
+    const beatgrid = new SeratoBeatGridFrame()
+
     for (let n = 0; n < trackInfo.beatgridMarkers.length - 1; n++) {
       const marker = new SeratoNonTerminalBeatGridMarker()
       const thisMarker = trackInfo.beatgridMarkers[n]
@@ -121,10 +126,11 @@ export function encode(trackInfo: SeratoTrackInfo) {
     marker.position = thisMarker.position
     marker.bpm = thisMarker.bpm
     beatgrid.data.push(marker)
+
+    // only write beatgrid information when beatgrid markers defined
+    // => do not overwrite
+    frameMap[beatgrid.id] = encodeFrame(beatgrid)
   }
 
-  return {
-    [markers2.id]: encodeFrame(markers2),
-    [beatgrid.id]: encodeFrame(beatgrid),
-  } as FrameMap
+  return frameMap
 }

@@ -89,20 +89,29 @@ export async function writeSeratoData(trackPath: string, trackInfo: SeratoTrackI
   const tags = encode(trackInfo)
 
   if (trackPath.endsWith('.mp3')) {
-    await writeId3Tags(trackPath, {
+    const taglibTags = {
       'Serato Markers2': tags['Serato Markers2'].toString('base64'),
       // 'Serato Markers_' duplicates first 5 cues
       // and gets precedence over Serato Markers2 -> delete it
       'Serato Markers_': '',
-      'Serato BeatGrid': tags['Serato BeatGrid'].toString('base64'),
-    })
+    } as TaglibId3Map
+    if ('Serato BeatGrid' in tags) {
+      taglibTags['Serato BeatGrid'] = tags['Serato BeatGrid'].toString('base64')
+    }
+
+    await writeId3Tags(trackPath, taglibTags)
   } else {
     // VORBIS COMMENT has newlines every 72 characters
-    await writeTaglibTags(trackPath, {
-      SERATO_MARKERS_V2: [tags['Serato Markers2'].toString('base64')
-        .replace(/(.{72})/g, '$1\n')],
-      SERATO_BEATGRID: [tags['Serato BeatGrid'].toString('base64')
-        .replace(/(.{72})/g, '$1\n')],
-    })
+    const taglibTags = {
+      SERATO_MARKERS_V2: [tags['Serato Markers2']
+        .toString('base64').replace(/(.{72})/g, '$1\n')],
+    }
+
+    if ('Serato BeatGrid' in tags) {
+      taglibTags['SERATO_BEATGRID'] = [tags['Serato BeatGrid']
+        .toString('base64').replace(/(.{72})/g, '$1\n')]
+    }
+
+    await writeTaglibTags(trackPath, taglibTags)
   }
 }
