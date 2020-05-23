@@ -94,11 +94,14 @@ export async function writeSeratoData(trackPath: string, trackInfo: SeratoTrackI
       // 'Serato Markers_' duplicates first 5 cues
       // and gets precedence over Serato Markers2 -> delete it
       'Serato Markers_': '',
+      'Serato BeatGrid': tags['Serato BeatGrid'].toString('base64'),
     })
   } else {
     // VORBIS COMMENT has newlines every 72 characters
     await writeTaglibTags(trackPath, {
       SERATO_MARKERS_V2: [tags['Serato Markers2'].toString('base64')
+        .replace(/(.{72})/g, '$1\n')],
+      SERATO_BEATGRID: [tags['Serato BeatGrid'].toString('base64')
         .replace(/(.{72})/g, '$1\n')],
     })
   }
