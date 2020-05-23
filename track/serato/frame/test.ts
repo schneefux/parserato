@@ -94,6 +94,22 @@ test('should decode Serato BeatGrid frame', () => {
   expect(terminal.bpm).toBe(149.57449340820312)
 })
 
+test('should decode Serato BeatGrid frame with 1 marker', () => {
+  const buf = Buffer.from('YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQmVhdEdyaWQAAQAAAAABPTw+gkKWAAAz', 'base64')
+  const frame = encoder.decode(buf)! as SeratoBeatGridFrame
+
+  expect(frame).toBeDefined()
+  expect(frame.id).toBe('Serato BeatGrid')
+  expect(frame.size).toBe(15)
+
+  expect(frame.data.length).toBe(1)
+  expect(frame.data[0]).toBeInstanceOf(SeratoTerminalBeatGridMarker)
+
+  const terminal = frame.data[0] as SeratoTerminalBeatGridMarker
+  expect(terminal.position).toBe(0.04595804959535599)
+  expect(terminal.bpm).toBe(75)
+})
+
 test('should encode to Serato Makers 2 frame', () => {
   const frame = new SeratoBeatGridFrame()
 

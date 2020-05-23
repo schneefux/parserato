@@ -1,4 +1,5 @@
 import { decode, encode } from "./index"
+import SeratoTerminalBeatGridMarker from "./frame/beatgrid/SeratoTerminalBeatGridMarker"
 
 const testId3Tags = {
   "Serato Analysis": "YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQW5hbHlzaXMAAgE=",
@@ -43,6 +44,8 @@ const testFlacTag = {
 
 const markers2WithCues = 'YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gTWFya2VyczIAAQFBUUZEVlVVQUFBQUFEUUFBQUFBVmFnRE1BQUFBQUFCRFZVVUFBQUFBRFFBQkFBSkxUZ0FBQU13QUFBQUEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 const markers2NoCues   = 'YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gTWFya2VyczIAAQFBUUZEVDB4UFVnQUFBQUFFQVAvLy8wSlFUVXhQUTBzQUFBQUFBUUFBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+// TODO last footer byte is not always 0 - this BeatGrid tag was found in the wild ending with `...AAAz`
+const beatgrid1 = Buffer.from('YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQmVhdEdyaWQAAQAAAAABPTw+gkKWAAAA', 'base64')
 
 test('should deserialize track info from ID3', () => {
   const geobTags = [...Object.values(testId3Tags)]
@@ -92,6 +95,15 @@ test('should deserialize track info from markers2 without cues', () => {
   expect(trackInfo.color).toBe('#ffffff')
 })
 
+test('should deserialize track info from 1 beatgrid marker', () => {
+  const trackInfo = decode({
+    'Serato BeatGrid': beatgrid1,
+  })
+
+  expect(trackInfo.beatgridMarkers).toBeDefined()
+  expect(trackInfo.beatgridMarkers!.length).toBe(1)
+})
+
 test('should serialize track info with cues', () => {
   const cues = [
     { index: 0, color: '#cc0000', milliseconds: 5482, name: '' },
@@ -120,4 +132,17 @@ test('should serialize track info without cues', () => {
   })
 
   expect(map['Serato Markers2'].toString('base64')).toBe(markers2NoCues)
+})
+
+test('should serialize track info with 1 beatgrid marker', () => {
+  const map = encode({
+    beatgridMarkers: [
+      Object.assign(new SeratoTerminalBeatGridMarker(), {
+        position: 0.04595804959535599,
+        bpm: 75,
+      })
+    ]
+  })
+
+  expect(map['Serato BeatGrid'].toString('hex')).toBe(beatgrid1.toString('hex'))
 })
