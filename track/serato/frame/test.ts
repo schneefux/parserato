@@ -148,11 +148,11 @@ test('should encode to Serato Makers 2 frame', () => {
 test('should not encode beatgrid without beatgrid markers', () => {
   const frame = new SeratoBeatGridFrame()
 
-  expect(() => encoder.encode(frame)).toThrow()
+  expect(() => encoder.encode(frame)).toThrow(/must/)
 })
 
 test('should not encode markers2 without bpm lock and color markers', () => {
   const frame = new SeratoMarkers2Frame()
 
-  expect(() => encoder.encode(frame)).toThrow()
+  expect(() => encoder.encode(frame)).toThrow(/must/)
 })

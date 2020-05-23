@@ -112,6 +112,9 @@ export function encode(trackInfo: SeratoTrackInfo) {
   }
 
   if (trackInfo.beatgridMarkers !== undefined) {
+    if (trackInfo.beatgridMarkers.length == 0) {
+      throw new Error('At least 1 beatgrid marker must be set')
+    }
     const beatgrid = new SeratoBeatGridFrame()
 
     for (let n = 0; n < trackInfo.beatgridMarkers.length - 1; n++) {

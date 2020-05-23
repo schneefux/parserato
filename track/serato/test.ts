@@ -154,3 +154,7 @@ test('should serialize track info with 1 beatgrid marker', () => {
 
   expect(map['Serato BeatGrid'].toString('hex')).toBe(beatgrid1.toString('hex'))
 })
+
+test('should not serialize track info with 0 beatgrid markers', () => {
+  expect(() => encode({ beatgridMarkers: [] })).toThrow(/must/)
+})
