@@ -14,7 +14,7 @@ export default class SeratoMarkers2Frame implements Frame<SeratoMarker[]> {
   mimetype = 'application/octet-stream'
   filename = ''
   id = 'Serato Markers2'
-  size = 512 - 41 // 41 for GEOB header
+  size = 512 - 42 // 42 for GEOB header
   versionMajor: number = 1
   versionMinor: number = 1
   data: SeratoMarker[] = []
@@ -57,6 +57,10 @@ export default class SeratoMarkers2Frame implements Frame<SeratoMarker[]> {
   }
 
   encode(): Buffer {
+    if (this.data.length == 0) {
+      throw new Error('Markers2 must contain at least a color marker and a BPM lock marker')
+    }
+
     const bufSize = 2 + this.data
       .map(marker => marker.id.length + 1 + 4 + marker.size)
       .reduce((sum, s) => sum + s, 0) + 1

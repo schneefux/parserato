@@ -81,6 +81,7 @@ export function decode(tags: FrameMap) {
  * @returns GEOB Frames
  */
 export function encode(trackInfo: SeratoTrackInfo) {
+  // TODO: Do not blindly override - merge 'Serato Marker2' data
   const frameMap = {} as FrameMap
 
   if (trackInfo.color !== undefined
@@ -88,13 +89,10 @@ export function encode(trackInfo: SeratoTrackInfo) {
    || trackInfo.bpmLock !== undefined) {
     const markers2 = new SeratoMarkers2Frame()
 
-    if (trackInfo.color !== undefined) {
-      const colorMarker = Object.assign(new SeratoColorMarker(), {
-        color: trackInfo.color || '#ffffff',
-      })
-
-      markers2.data.push(colorMarker)
-    }
+    const colorMarker = Object.assign(new SeratoColorMarker(), {
+      color: trackInfo.color || '#ffffff',
+    })
+    markers2.data.push(colorMarker)
 
     trackInfo.cues?.forEach((cue, index) => {
       const cueMarker = Object.assign(new SeratoCueMarker(), {
@@ -107,13 +105,10 @@ export function encode(trackInfo: SeratoTrackInfo) {
       markers2.data.push(cueMarker)
     })
 
-    if (trackInfo.bpmLock !== undefined) {
-      const bpmLockMarker = Object.assign(new SeratoBpmLockMarker(), {
-        isActive: trackInfo.bpmLock || false,
-      })
-
-      markers2.data.push(bpmLockMarker)
-    }
+    const bpmLockMarker = Object.assign(new SeratoBpmLockMarker(), {
+      isActive: trackInfo.bpmLock || false,
+    })
+    markers2.data.push(bpmLockMarker)
 
     frameMap[markers2.id] = encodeFrame(markers2)
   }
