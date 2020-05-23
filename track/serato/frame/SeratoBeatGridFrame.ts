@@ -56,6 +56,10 @@ export default class SeratoBeatGridFrame implements Frame<SeratoBeatGridMarker[]
   }
 
   encode(): Buffer {
+    if (this.data.length == 0) {
+      throw new Error('BeatGrid must contain at least 1 marker')
+    }
+
     const buf = Buffer.alloc(this.size)
     buf.writeInt8(this.versionMajor, 0)
     buf.writeInt8(this.versionMinor, 1)

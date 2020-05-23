@@ -125,3 +125,9 @@ test('should encode to Serato Makers 2 frame', () => {
 
   expect(encoder.encode(frame).toString('hex')).toBe(testFrameSeratoBeatgrid.toString('hex'))
 })
+
+test('should not encode without beatgrid markers', () => {
+  const frame = new SeratoBeatGridFrame()
+
+  expect(() => encoder.encode(frame)).toThrow()
+})
