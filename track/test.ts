@@ -46,7 +46,7 @@ test('should write Serato data to flac', async () => {
   expect(tags).toMatchObject({
     "SERATO_ANALYSIS": ["YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQW5hbHlzaXMAAgEC"],
     "SERATO_AUTOGAIN": ["YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQXV0b3RhZ3MAAQEyMjkuNzcALTMu\n" + "MjQ1ADAuMDAwAA"],
-    "SERATO_BEATGRID": ["YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQmVhdEdyaWQAAQAAAAACP0bwmwAA\n" + "AAQ/7I+DQ2XGVwB7"],
+    "SERATO_BEATGRID": ["YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gQmVhdEdyaWQAAQAAAAACP0bwmwAA\n" + "AAQ/7I+DQ2XGVwA="],
     "SERATO_MARKERS_V2": ["YXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtAABTZXJhdG8gTWFya2VyczIAAQFBUUZEVDB4UFVn\n" +
       "QUFBQUFFQVAvLy8wTlZSUUFBQUFBZEFBVUFBRm9VQU15SUFBQnpkR0Z5ZENCdlppQjBjbUZq\n" +
       "YXlEaW1hVkQKVlVVQUFBQUFEUUFHQUFGekVRRE1BTXdBQUFCRFZVVUFBQUFBRFFBSEFBSFpQ\n" +
@@ -91,6 +91,19 @@ test('should write Serato data to mp3', async () => {
 
   const data = await readSeratoData(path.join(testData, 'tmp', 'retro_funky.mp3'))
   expect(data).toBeDefined()
+})
+
+test('should merge Serato Markers2 data', async () => {
+  await copyFile(path.join(testData, 'retro_funky.mp3'), path.join(testData, 'tmp', 'retro_funky.mp3'))
+
+  // file already has 3 cues
+  await writeSeratoData(path.join(testData, 'tmp', 'retro_funky.mp3'), {
+    color: '#ff0000',
+  })
+
+  const data = await readSeratoData(path.join(testData, 'tmp', 'retro_funky.mp3'))
+  expect(data.color).toBe('#ff0000')
+  expect(data.cues!.length).toBe(3)
 })
 
 test('should read track info from mp3', async () => {

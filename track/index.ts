@@ -83,11 +83,19 @@ export async function write(trackInfo: TrackInfo) {
 /**
  * Write Serato track information to an audio file.
  *
+ * Update markers2 if color, bpmLock or cues are given.
+ * Unless all 3 are given, merge with existing data or defaults.
+ * Update beatgrid if beatgridMarkers are given.
+ *
  * @param trackPath file path
  * @param trackInfo track information
  */
 export async function writeSeratoData(trackPath: string, trackInfo: SeratoTrackInfo) {
-  const tags = encode(trackInfo)
+  const existingTrackInfo = trackInfo.color !== undefined
+    || trackInfo.bpmLock !== undefined
+    || trackInfo.cues !== undefined ?
+    await readSeratoData(trackPath) : {}
+  const tags = encode({ ...existingTrackInfo, ...trackInfo })
 
   if (trackPath.endsWith('.mp3')) {
     const taglibTags = {} as TaglibId3Map

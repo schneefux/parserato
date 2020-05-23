@@ -72,16 +72,14 @@ export function decode(tags: FrameMap) {
 /**
  * Encode track information to GEOB Frame buffers.
  *
- * Return 'Serato Marker2' if any of color,
- *   cues or bpmLock are given.
- *   Defaults will be used for those that are not.
+ * Return 'Serato Marker2' if any of color, cues or bpmLock are given.
+ * Defaults will be used for those that are not.
  * Return 'Serato BeatGrid' if beatgridMarkers are given.
  *
  * @param trackInfo data
  * @returns GEOB Frames
  */
 export function encode(trackInfo: SeratoTrackInfo) {
-  // TODO: Do not blindly override - merge 'Serato Marker2' data
   const frameMap = {} as FrameMap
 
   if (trackInfo.color !== undefined
