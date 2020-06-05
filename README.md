@@ -7,6 +7,8 @@ Serato data interface for NodeJS.
 
 Find and read Serato crates, read and write cues Serato GEOB frames.
 
+If you want to use this library in a commercial application, contact me by mail.
+
 Installation
 ---
 

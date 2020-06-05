@@ -14,7 +14,7 @@
     "parserato": "./dist/cli.js"
   },
   "author": "schneefux",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "drivelist": "^8.0.10",
     "glob": "^7.1.6",
